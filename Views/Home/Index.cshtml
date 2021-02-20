@@ -1,0 +1,146 @@
+﻿@{
+    ViewBag.Title = "Assessment Work";
+}
+
+<div class="container jumbotron">
+    <h1 class="text-center">Assessment Work</h1>
+</div>
+<form>
+    <div class="row container-fluid mt-5">
+        <div class="form-group col-lg-4">
+            <select id="client" class="form-control">
+                <option>Select ClientID</option>
+                @foreach (var std in ViewBag.c_list)
+                {
+                    <option>
+                        @std.sName
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="form-group col-lg-4">
+            <select id="state" class="form-control">
+                <option>Select StateID</option>
+                @foreach (var std in ViewBag.st_list)
+                {
+                    <option>
+                        @std.sCode
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="form-group col-lg-4">
+            <select id="status" class="form-control">
+                <option>Select StatusID</option>
+                @foreach (var std in ViewBag.ss_list)
+                {
+                    <option>
+                        @std.sName
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="row center-block">
+        <button type="button" class="btn btn-primary" onclick="onSubmit()">Submit</button>
+    </div>
+</form>
+
+
+<div class="alert alert-success" id="success" style="display:none">
+    <strong>Success!</strong> WorkOrder has been added successfully.
+</div>
+
+<div class="alert alert-danger" id="count" style="display:none">
+    <strong></strong> workorders are added.
+</div>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+    var isClientChanged = false;
+    var changedvalue_client = null;
+
+    var isStateChanged = false;
+    var changedvalue_state = null;
+
+    var isStatusChanged = false;
+    var changedvalue_status = null;
+    $("#client").on("change", function () {
+        //alert($("#client").val());
+        isClientChanged = true;
+        changedvalue_client = $("#client").val();
+       
+    });
+
+    $("#state").on("change", function () {
+        //alert($("#state").val());
+        isStateChanged = true;
+        changedvalue_state = $("#state").val();
+    });
+
+    $("#status").on("change", function () {
+        //alert($("#status").val());
+        isStatusChanged = true;
+        changedvalue_status = $("#status").val();
+    });
+
+    function onSubmit() {
+
+        //alert(changedvalue_state + changedvalue_client + changedvalue_status);
+
+      
+        var workOrderModel = {
+            nClientID: changedvalue_client,
+            nStatusID: changedvalue_status,
+            nStateID: changedvalue_state
+        }; 
+
+
+        console.log("sending ajax call");
+        $.ajax({
+            type: "POST",
+            url: "/Home/AddData2WorkOrder?clientName=" + changedvalue_client + "&statusName=" + changedvalue_status + "&stateName=" + changedvalue_state,
+            data: null,
+            contentType: 'application/x-www-form-urlencoded',
+            datatype: "html",
+            success: function (data) {
+             //   alert(data.msg);
+                $("#success").css("display", "block");
+                setTimeout(function () {
+                    $("#success").css("display", "none");
+                }, 3000);
+                
+            },
+            error: function () {
+             //   alert("Error occured!!")
+             //   alert("Error occured!!")
+            }
+        });
+    }
+
+
+
+    var myInterval = setInterval(function () {
+        $.ajax({
+            type: "GET",
+            url: "/Home/GetCountWorkOrders",
+            data: null,
+            contentType: 'application/x-www-form-urlencoded',
+            datatype: "html",
+            success: function (data) {
+                $("#count").find("strong").text(data);
+                $("#count").css("display", "block");
+                setTimeout(function () {
+                    $("#count").css("display", "none");
+                }, 3000);
+               
+            },
+            error: function () {
+              
+            }
+        });
+
+    }, 7000);
+</script>
